@@ -352,13 +352,20 @@ CONSTRAINTS
 # The agent loop
 # ---------------------------------------------------------------------------
 
-def run_scheduling_pass(sim_time: str, verbose: bool = True) -> dict:
+def run_scheduling_pass(
+    sim_time: str,
+    verbose: bool = True,
+    excluded_job_ids: set | list | None = None,
+) -> dict:
     """
     Run one scheduling pass at sim_time. The compute agent will:
-    1. Pull the pending queue.
+    1. Pull the pending queue (excluding any already-decided jobs).
     2. Request a grid briefing (which itself runs the grid agent).
     3. Evaluate candidate slots.
     4. Submit a schedule with one decision per job.
+
+    excluded_job_ids: set of job_ids already decided in prior ticks. The runner
+    passes this so jobs scheduled earlier don't show up as "pending" again.
 
     Returns:
         {
@@ -369,6 +376,19 @@ def run_scheduling_pass(sim_time: str, verbose: bool = True) -> dict:
             "sim_time": str
         }
     """
+    excluded = set(excluded_job_ids or [])
+
+    # Build a local tool-impl table. If excluded ids were given, wrap
+    # list_pending_jobs to filter them out before the agent sees the queue.
+    if excluded:
+        def _filtered_list_pending(sim_time):
+            result = _impl_list_pending_jobs(sim_time)
+            result["jobs"] = [j for j in result["jobs"] if j["job_id"] not in excluded]
+            result["count"] = len(result["jobs"])
+            return result
+        local_impls = {**TOOL_IMPLEMENTATIONS, "list_pending_jobs": _filtered_list_pending}
+    else:
+        local_impls = TOOL_IMPLEMENTATIONS
     user_message = (
         f"Run a scheduling pass at sim_time {sim_time}.\n"
         f"Available zones: {', '.join(gridcache.available_zones())}.\n"
@@ -426,7 +446,7 @@ def run_scheduling_pass(sim_time: str, verbose: bool = True) -> dict:
         for block in response.content:
             if block.type != "tool_use":
                 continue
-            impl = TOOL_IMPLEMENTATIONS.get(block.name)
+            impl = local_impls.get(block.name)
             if impl is None:
                 result = {"error": f"unknown tool {block.name}"}
             else:
