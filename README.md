@@ -310,9 +310,3 @@ To switch, replace `data/synthetic_grid.parquet` with a real-data parquet of the
 - ✅ Compute-side Claude agent with hard-bid decision rules (`compute_agent.py`)
 - ✅ Multi-tick orchestrator with persistent artifacts (`runner.py`)
 - ✅ Naive and heuristic baselines for comparison (`baselines.py`)
-
-Remaining for the demo:
-
-- 🔲 `compare.py` — side-by-side scorecard across all three policies on the same window
-- 🔲 `app.py` — Streamlit UI with map, grid panel, agent transcript, scorecard
-- 🔲 Real-data validation — one screenshot of the agent running on a real PJM CSV slice, for the credibility paragraph in the deck
