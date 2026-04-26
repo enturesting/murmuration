@@ -32,9 +32,7 @@ import gridcache
 
 load_dotenv()
 
-# Use the current Sonnet — a good balance of reasoning quality and cost.
-# Swap to "claude-opus-4-7" for the strongest reasoning, or "claude-haiku-4-5"
-# for cheapest. 
+# Options are : "claude-opus-4-7" or "claude-haiku-4-5"
 MODEL = "claude-sonnet-4-6"
 MAX_ITERATIONS = 8           # safety cap on the agent loop
 MAX_TOKENS = 4096
@@ -43,7 +41,7 @@ client = Anthropic()
 
 
 # ---------------------------------------------------------------------------
-# Tool implementations — thin wrappers around gridcache
+# Tool implementations — wrappers around gridcache
 # ---------------------------------------------------------------------------
 
 def _impl_get_all_zones_snapshot(sim_time: str) -> dict:
@@ -304,7 +302,7 @@ def produce_briefing(request: dict, verbose: bool = True) -> dict:
 
         # Otherwise execute pending tool calls and feed results back
         if response.stop_reason != "tool_use":
-            # Agent stopped without submitting — unusual, log and break
+            # Agent stopped without submitting 
             if verbose:
                 print(f"\n[grid_agent !] stopped without submit_briefing "
                       f"(stop_reason={response.stop_reason})")
