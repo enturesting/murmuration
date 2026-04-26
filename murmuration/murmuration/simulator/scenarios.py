@@ -130,6 +130,16 @@ SCENARIOS: list[Scenario] = [
         description="Loudoun substation supplying DC-VA-1a saturates; that AZ drops out. Sibling AZs (DC-VA-1b Sterling, DC-VA-1c Manassas) absorb the load — intra-region failover, no SLA hit.",
         icon="bolt",
     ),
+    Scenario(
+        name="VA grid self-healing · resilience",
+        bas=["PJM"],
+        kind="contingency",
+        lmp_overrides={"PJM": 290.0},
+        stress_overrides={"PJM": 0.78},
+        duration_min=6,
+        description="500 kV Loudoun↔DOM-Hub line trips. DC-VA-1a (Ashburn) is downstream of the failed edge. The healer reroutes power via the 230 kV Sterling path while DMV reserve clusters (VA/DC/MD home batteries + EVs + thermostats) push MW back to PJM. Self-healing + DER aggregation, working in concert.",
+        icon="bolt",
+    ),
 ]
 
 REGISTRY = {s.name: s for s in SCENARIOS}
