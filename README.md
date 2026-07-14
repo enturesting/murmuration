@@ -27,11 +27,12 @@ layer.
 Everything below runs fully offline — live data sources and Claude narration are optional
 enrichments via [`.env.example`](.env.example).
 
-> **Unified mode (this branch):** the flagship server now hosts all three apps from one URL —
+> **Unified mode:** the flagship server hosts all three apps from one URL —
 > `/` is the live-agent system, `/replay/` serves the nictopia real-incident replay (committed
-> static build, no Node needed at runtime), and the new **⚖ Economics** tab drives the
+> static build, no Node needed at runtime), and the **⚖ Economics** tab drives the
 > agentic_workflow prototype's hard-bid job scheduler through `/api/backtest/*` endpoints.
 > Start it with the flagship quick start below and everything is reachable from one place.
+> The replay bundle is regenerated with `scripts/build_replay.sh` after any nictopia change.
 
 ### 1. `murmuration/` — the flagship (Python)
 

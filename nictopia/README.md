@@ -67,6 +67,9 @@ npm run build
 npm run preview
 ```
 
+A static build of this app is committed at `murmuration/ui/replay/` and served by the flagship
+server at `/replay/` — regenerate it with `../scripts/build_replay.sh` after source changes.
+
 ### Demo flow
 
 1. Pick one of the three scenarios from the top bar (ERCOT heat wave / CAISO wildfire / Duck curve).

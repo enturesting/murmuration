@@ -44,7 +44,7 @@ For the full design + thesis, read [`MURMURATION.md`](../MURMURATION.md) and
 - **Topology graph** — `networkx`-backed substation graph with K-shortest
   paths and a `TopologyHealer` that responds to alerts with a
   `TopologyReconfigure` event.
-- **Three views in the UI** at `http://127.0.0.1:8765`:
+- **Four views in the UI** at `http://127.0.0.1:8765`:
   - **3D Globe** — globe.gl over the US with pulsating BA / DC / VPP nodes,
     flashing dispatch arcs, and intra/cross-region migration arcs.
   - **Flat Map** — d3 + Albers USA projection, ISO service-territory polygons,
@@ -54,6 +54,9 @@ For the full design + thesis, read [`MURMURATION.md`](../MURMURATION.md) and
   - **Story** — presentation-grade walkthrough that paces an agentic narrative
     over a clean schematic (trigger → dispatch → ack → checkpoint → migrate →
     grid recovery), with stakeholder value cards across the bottom.
+  - **Economics** — the **⚖** tab: a backtest prototype that generates a
+    synthetic 14-day dataset, lets you browse hard-bid jobs, and returns a
+    per-job cheapest-slot recommendation (no API keys).
 - **9 prebuilt scenarios** wired to the bus — Texas heat wave, CAISO evening
   ramp, PJM-DOM congestion, CAISO surplus solar, polar vortex cascade, PJM
   line-trip contingency, carbon arbitrage, ERCOT solar eclipse, PJM Loudoun
@@ -243,6 +246,24 @@ You need to create the venv first — see [Quick start](#quick-start) step 2.
 **Browser still shows old UI after editing `ui/index.html`.**
 The server sets `Cache-Control: no-store`, but extensions / service workers
 can still cache. Hard-reload (⌘⇧R / Ctrl+F5).
+
+---
+
+## Backtest API
+
+The **⚖ Economics** tab is driven by four REST endpoints that wrap the repo's
+[`agentic_workflow/`](../agentic_workflow/) hard-bid prototype. They need no API
+keys — everything runs on a locally generated synthetic dataset:
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/backtest/generate` | Build the synthetic 14-day, 4-zone grid + job dataset for this environment. |
+| `GET /api/backtest/summary` | Dataset overview — zones, horizon, job counts, price stats. |
+| `GET /api/backtest/jobs` | List the hard-bid jobs (each with its max willingness-to-pay). |
+| `GET /api/backtest/recommend/{job_id}` | Cheapest feasible slot for one job (rejection is a valid answer). |
+
+The nictopia real-incident replay is served alongside these at `/replay/` as a
+committed static build (no Node at runtime).
 
 ---
 
