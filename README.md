@@ -111,8 +111,8 @@ system we staged. The written comparison that drove the final call is in
 
 - **Nick Allison** ([@enturesting](https://github.com/enturesting)) — nictopia globe demo,
   real-incident data anchoring, demo narrative + pitch materials, integration
-- **Teddy Allison** — scenario decisioning, deep research, and design thinking across the
-  demo narrative
+- **Teddy Allison** — scenario decisioning, deep research and design thinking,
+  real-incident data anchoring, demo narrative
 - **Rohan Dani** ([@RohanDani2](https://github.com/RohanDani2)) — `agentic_workflow/` prototype:
   synthetic grid generator, hard-bid compute-agent economics
 - **Shashank Chikara** — flagship `murmuration/` package: protocol layer, live agents, anomaly
