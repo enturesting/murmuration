@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Murmuration — Distributed Grid Intelligence</title>
+    <title>Murmuration — SCSP Hackathon · Electric Grid Optimization</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reset.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
@@ -13,18 +13,47 @@
     <style>
         :root {
             --accent: #4fc3f7;
+            --accent-dim: #2d6c85;
             --warn: #ff8a65;
             --good: #81c784;
+            --muted: #888;
         }
-        .reveal h1, .reveal h2, .reveal h3 { color: var(--accent); letter-spacing: -0.5px; }
-        .reveal .tag { color: #888; font-size: 0.5em; text-transform: uppercase; letter-spacing: 2px; }
-        .reveal .arc { display: flex; gap: 1.0rem; justify-content: center; margin-top: 1.6rem; }
-        .reveal .arc > div {
-            flex: 1; padding: 0.8rem; border: 1px solid #333; border-radius: 8px;
-            font-size: 0.5em; text-align: left;
+        .reveal h1 { color: var(--accent); letter-spacing: -1px; font-size: 3.2em; }
+        .reveal h2 { color: var(--accent); letter-spacing: -0.5px; font-size: 1.9em; line-height: 1.15; margin-bottom: 0.6em; }
+        .reveal h3 { color: #eee; font-weight: 400; font-size: 1.1em; }
+        .reveal .tag { color: var(--muted); font-size: 0.45em; text-transform: uppercase; letter-spacing: 3px; margin: 0; }
+        .reveal small { color: var(--muted); }
+
+        /* slide 1 — title */
+        .reveal .title-slide { text-align: center; }
+        .reveal .title-slide img { max-width: 65%; max-height: 60vh; margin: 0 auto 1rem; display: block; }
+        .reveal .title-slide .team { color: #fff; font-size: 1.0em; margin-top: 0.8rem; letter-spacing: 1px; }
+
+        /* slide 2 — problem */
+        .reveal .problem-list { list-style: none; margin: 1.2rem auto 0; max-width: 90%; }
+        .reveal .problem-list li { font-size: 0.62em; line-height: 1.45; text-align: left; margin-bottom: 0.9rem; padding-left: 1rem; border-left: 3px solid var(--warn); }
+        .reveal .problem-list li b { color: var(--warn); }
+
+        /* slide 3 — solution */
+        .reveal .solution-blocks { display: flex; flex-direction: column; gap: 0.5rem; max-width: 88%; margin: 0.8rem auto 0; }
+        .reveal .solution-blocks > div {
+            padding: 0.55rem 0.95rem; border-left: 3px solid var(--accent);
+            background: rgba(79, 195, 247, 0.05); text-align: left;
+            font-size: 0.55em; line-height: 1.35;
         }
-        .reveal .arc > div b { display: block; color: var(--accent); margin-bottom: 0.3rem; }
-        .reveal small { color: #888; }
+        .reveal .solution-blocks > div b { color: var(--accent); display: block; margin-bottom: 0.15rem; font-size: 1.05em; }
+
+        /* slide 4 — close + demo bridge */
+        .reveal .close-slide { text-align: center; }
+        .reveal .close-slide .sticky {
+            font-size: 1.4em; color: #fff; line-height: 1.3; margin: 1.5rem auto;
+            max-width: 85%;
+        }
+        .reveal .close-slide .sticky em { color: var(--accent); font-style: normal; }
+        .reveal .close-slide .ask { font-size: 0.7em; color: #ccc; margin-top: 1.2rem; letter-spacing: 1px; }
+        .reveal .close-slide .questions {
+            font-size: 1.6em; color: var(--accent); margin-top: 1.5rem; letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
@@ -32,33 +61,76 @@
 <div class="reveal">
     <div class="slides">
 
-        <!-- Single cold-open slide. Speaker delivers problem framing verbally; demo is the rest of the deck. -->
-        <section>
+        <!-- ============ SLIDE 1 · TITLE ============ -->
+        <section class="title-slide">
+            <img src="murmuration_logo.png" alt="Murmuration — bird-flock-and-circuit logo">
+            <p class="team">Nick · Rohan · Shashank · Teddy</p>
             <p class="tag">SCSP Hackathon · Electric Grid Optimization</p>
-            <h1>Murmuration</h1>
-            <h3>A protocol — and two live agents — for the grid and the AI compute fleet to negotiate flexibility under stress</h3>
-
-            <div class="arc">
-                <div><b>NEED</b>Grid stress detected. Live GridStateUpdate from EIA-930 + gridstatus. DispatchRequest fires on the bilateral bus.</div>
-                <div><b>DISPATCH</b>Compute fleet's standing FlexibilityEnvelope auto-accepts. TelemetryFrame streams. VPP swarm joins on the same wire format.</div>
-                <div><b>SELF-HEAL</b>Substation drops. Anomaly detector fires. Topology healer reroutes. Workload router fails over to sibling AZs. None of it scripted.</div>
-                <div><b>PROTECT</b>Critical load held. Peakers stayed cold. Settled at envelope rate.</div>
-            </div>
-
-            <p style="margin-top:1.4rem;"><small>Two real scenarios · One protocol · Two live Claude-narrated agents · Anchored to actual archived events</small></p>
 
             <aside class="notes">
-                Hook (LOCKED: A — re-confirm at 2pm sync):
-                  "The grid and the AI compute fleet need to start talking. We built the protocol — and the agents that speak it."
+                Slide 1 — TITLE. Spoken: hook A, locked.
+                "The grid and the AI compute fleet need to start talking. We built the protocol — and the agents that speak it."
+                Names + SCSP track delivered over this slide. Don't linger.
+                Total time on this slide: ~10s max. Then advance to Problem.
+            </aside>
+        </section>
 
-                Problem paint comes BEFORE the hook (~15s) — see presenter_card.md / demo_flow.md.
-                Names + SCSP Grid track (5s — fast).
-                "What you'll see: two real-world scenarios, one protocol, two real Python agents on a bilateral bus, anchored to actual archived events."
+        <!-- ============ SLIDE 2 · PROBLEM ============ -->
+        <section class="problem-slide">
+            <h2>The grid is breaking more often, with higher stakes.</h2>
 
-                Then SWITCH to live app at http://127.0.0.1:8765/  (NOT 5173 — that was nictopia)
-                3D Globe tab selected by default.
-                Don't linger on this slide.
-                Beat 1 target ~45s · hard cap 55s (problem paint + hook + arc).
+            <ul class="problem-list">
+                <li class="fragment">Heat waves · polar vortexes · line trips · <b>Asheville floods · Maui fires · California wildfires</b></li>
+                <li class="fragment">The operator at 2 AM has three tools: <b>peakers · curtailment · brownouts</b>. Each one costs more than the last.</li>
+                <li class="fragment">Meanwhile <b>billions of dollars of flexibility sit idle</b> when stress hits — no common language fast enough to coordinate.</li>
+            </ul>
+
+            <aside class="notes">
+                Slide 2 — PROBLEM (~18s, Beat 1 problem paint). Three fragments mirror three spoken sentences — speak as scenes, not bullets.
+                After third fragment: brief pause + acknowledgment ("I've probably missed ones that hit closer to home for some of you.")
+            </aside>
+        </section>
+
+        <!-- ============ SLIDE 3 · HOW WE'RE SOLVING IT ============ -->
+        <section>
+            <h2>The wire format for the flexible energy fleet.</h2>
+
+            <div class="solution-blocks">
+                <div><b>The protocol</b>Bilateral wire format · 7 message types · 2 live Python agents · standing envelopes negotiated in seconds.</div>
+                <div><b>Predictive models on top</b>Load forecasting · real-time anomaly detection · live awareness of where compute capacity is available.</div>
+                <div><b>AI is the load — and the solution</b>Same compute fleet creating grid pressure can relieve it · published as a standing offer the grid calls on in milliseconds.</div>
+            </div>
+
+            <aside class="notes">
+                Slide 3 — SOLUTION. Spoken: Beat 1 "what we built" + hook + democratization.
+                Headline IS the memorable phrase: "the wire format for the flexible energy fleet."
+                Three blocks map to: protocol, predictive models, AI-as-pressure-AND-solution.
+                After this slide, deliver the democratization paragraph verbally ("the door this opens..."), then advance to slide 4 as bridge into live demo.
+            </aside>
+        </section>
+
+        <!-- ============ SLIDE 4 · CLOSE + LIVE DEMO BRIDGE ============ -->
+        <section class="close-slide">
+            <h2>Watch it work.</h2>
+            <h3>2 real-world scenarios · 2 live Python agents · anchored to actual archived events</h3>
+
+            <p class="sticky">"The reserves of the future aren't just peaker plants.<br><em>They're neighborhoods.</em>"</p>
+
+            <p class="ask">PILOT ASK · 1 ISO · 1 HYPERSCALER · 1 VPP · 12 MONTHS · NO NEW MARKET RULES</p>
+
+            <p class="questions">Questions?</p>
+
+            <aside class="notes">
+                Slide 4 — DUAL PURPOSE: bridge into live demo AND close.
+
+                BEFORE DEMO: Speaker says "Watch it work" → SWITCH to live app at http://127.0.0.1:8765/ (3D Globe tab default).
+                The sticky neighborhoods line is on screen but not yet emphasized — it's the line you've already pre-loaded.
+
+                AFTER DEMO: Speaker returns to this slide (Reveal navigation: hit `b` to blackout while switching back, then return).
+                Now emphasize the sticky line, hit the pilot ask, and end on "Questions?"
+                If demo crashed mid-stream, this slide is the fallback close — pivot here at any time.
+
+                Beat 4 in presenter_card.md = the close content delivered over this slide.
             </aside>
         </section>
 
