@@ -2971,13 +2971,17 @@ function ensureEconTab() {
 
 async function econGenerate() {
   const st = document.getElementById('econ-status');
+  const btn = document.getElementById('econ-generate');
+  if (btn.disabled) return;
+  btn.disabled = true;
   st.textContent = 'generating…';
   try {
     const r = await fetch('/api/backtest/generate', {method: 'POST'});
     const d = await r.json();
     st.textContent = r.ok ? `generated: ${(d.generated || []).join(' · ')}` : (d.error || 'failed');
-    if (r.ok) econLoadAll(true);
+    if (r.ok) await econLoadAll(true);
   } catch (e) { st.textContent = 'request failed: ' + e; }
+  finally { btn.disabled = false; }
 }
 
 async function econLoadAll(announce) {

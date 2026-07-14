@@ -8,8 +8,11 @@ server can demo them without API keys. The full Claude runner stays CLI-only.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
+import tempfile
+import threading
 from pathlib import Path
 
 from fastapi import APIRouter
@@ -20,6 +23,9 @@ router = APIRouter(prefix="/api/backtest", tags=["backtest"])
 # repo root is three levels above this package dir: <root>/murmuration/murmuration/api/
 AW_DIR = Path(__file__).resolve().parents[3] / "agentic_workflow"
 DATA_DIR = AW_DIR / "data"
+
+# serializes /generate; readers don't block on it (they degrade to 409/503)
+_GEN_LOCK = threading.Lock()
 
 
 def _modules():
@@ -54,26 +60,50 @@ def _unreadable(exc: Exception) -> JSONResponse:
 
 @router.post("/generate")
 def generate():
-    """Run the prototype's one-shot data generator (~1s, no API keys)."""
-    # clear any previous dataset so format preference (parquet vs csv fallback)
-    # always matches what THIS environment can read back
-    if DATA_DIR.exists():
-        for p in DATA_DIR.glob("synthetic_*"):
-            p.unlink()
-    proc = subprocess.run(
-        [sys.executable, str(AW_DIR / "generate_grid.py")],
-        cwd=AW_DIR, capture_output=True, text=True, timeout=180,
-    )
-    if proc.returncode != 0:
+    """Run the prototype's one-shot data generator (~1s, no API keys).
+
+    The generator writes into a temp dir first; the live dataset is swapped in
+    only on success, so a failed/hung run never destroys the previous data.
+    """
+    if not _GEN_LOCK.acquire(blocking=False):
         return JSONResponse(
-            {"error": "generator failed", "stderr": proc.stderr[-2000:]},
-            status_code=500,
+            {"error": "a generation is already in progress"}, status_code=409,
         )
-    _, gridcache = _modules()
-    gridcache.load_grid.cache_clear()
-    gridcache.load_jobs.cache_clear()
-    files = sorted(p.name for p in DATA_DIR.glob("synthetic_*"))
-    return {"generated": files}
+    try:
+        with tempfile.TemporaryDirectory(prefix="murm-backtest-") as tmp:
+            try:
+                # generate_grid.py writes to <cwd>/data, so a temp cwd isolates it
+                proc = subprocess.run(
+                    [sys.executable, str(AW_DIR / "generate_grid.py")],
+                    cwd=tmp, capture_output=True, text=True, timeout=180,
+                )
+            except subprocess.TimeoutExpired:
+                return JSONResponse(
+                    {"error": "generator timed out after 180s"}, status_code=500,
+                )
+            if proc.returncode != 0:
+                return JSONResponse(
+                    {"error": "generator failed", "stderr": proc.stderr[-2000:]},
+                    status_code=500,
+                )
+            new_files = sorted((Path(tmp) / "data").glob("synthetic_*"))
+            if not new_files:
+                return JSONResponse(
+                    {"error": "generator produced no files"}, status_code=500,
+                )
+            # swap in: drop stale files (formats may differ per env), then
+            # atomically replace each new one
+            DATA_DIR.mkdir(exist_ok=True)
+            for p in DATA_DIR.glob("synthetic_*"):
+                p.unlink()
+            for p in new_files:
+                os.replace(p, DATA_DIR / p.name)
+        _, gridcache = _modules()
+        gridcache.load_grid.cache_clear()
+        gridcache.load_jobs.cache_clear()
+        return {"generated": [p.name for p in new_files]}
+    finally:
+        _GEN_LOCK.release()
 
 
 @router.get("/summary")
@@ -86,6 +116,12 @@ def summary():
         return _no_dataset()
     except ImportError as exc:
         return _unreadable(exc)
+    except Exception as exc:  # e.g. half-written file read mid-regeneration
+        return JSONResponse(
+            {"error": f"dataset read failed: {exc}",
+             "hint": "a regeneration may be in progress; retry shortly"},
+            status_code=503,
+        )
     t0, t1 = gridcache.time_range()
     return {
         "zones": gridcache.available_zones(),
@@ -115,6 +151,12 @@ def jobs():
         return _no_dataset()
     except ImportError as exc:
         return _unreadable(exc)
+    except Exception as exc:  # e.g. half-written file read mid-regeneration
+        return JSONResponse(
+            {"error": f"dataset read failed: {exc}",
+             "hint": "a regeneration may be in progress; retry shortly"},
+            status_code=503,
+        )
     cols = ["job_id", "kind", "sla", "duration_hours", "power_mw",
             "submitted_ts_utc", "deadline_ts_utc", "region_flexible",
             "pinned_zone", "max_price_usd_per_mwh", "bid_type"]
@@ -149,6 +191,12 @@ def recommend(job_id: str, max_stress_score: int = 3):
         return _no_dataset()
     except ImportError as exc:
         return _unreadable(exc)
+    except Exception as exc:  # e.g. half-written file read mid-regeneration
+        return JSONResponse(
+            {"error": f"dataset read failed: {exc}",
+             "hint": "a regeneration may be in progress; retry shortly"},
+            status_code=503,
+        )
     rows = j[j["job_id"] == job_id]
     if rows.empty:
         return JSONResponse({"error": f"unknown job_id {job_id!r}"}, status_code=404)
