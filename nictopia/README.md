@@ -50,7 +50,8 @@ Cached snapshots live in `public/cache/`:
 
 ## How to run it
 
-Requires Node.js 18+ and npm 9+.
+Requires Node.js 22.12+ and npm 11+ (Vite 8's floor; verified with Node 26 / npm 11 — older npm
+versions can silently skip Vite's native rolldown binding).
 
 ```bash
 npm install

@@ -63,14 +63,15 @@ For the full design + thesis, read [`MURMURATION.md`](../MURMURATION.md) and
 
 ## Quick start
 
-Requires **Python 3.12** (the lockfile was tested against 3.12 from Homebrew).
+Requires **Python 3.12+** (built on 3.12; a fresh install of the pinned requirements is also
+verified on 3.14).
 
 ```bash
 # 1. clone (or already cloned)
 cd murmuration
 
-# 2. create the venv and install deps
-python3.12 -m venv .venv
+# 2. create the venv and install deps (any Python 3.12+)
+python3 -m venv .venv
 .venv/bin/pip install --upgrade pip
 .venv/bin/pip install -r requirements.txt
 

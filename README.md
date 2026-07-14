@@ -36,7 +36,7 @@ anomaly detector, networkx topology healer, tiered workload router, 9 scenarios,
 
 ```bash
 cd murmuration
-python3.12 -m venv .venv
+python3 -m venv .venv          # Python 3.12+
 .venv/bin/pip install -r requirements.txt
 ./run.sh
 # open http://127.0.0.1:8765 — pick a scenario in the right rail (e.g. "Texas heat wave")
