@@ -118,12 +118,16 @@ def jobs():
     cols = ["job_id", "kind", "sla", "duration_hours", "power_mw",
             "submitted_ts_utc", "deadline_ts_utc", "region_flexible",
             "pinned_zone", "max_price_usd_per_mwh", "bid_type"]
+    import pandas as pd  # already loaded transitively via gridcache
+
     out = []
     for _, row in j.iterrows():
         rec = {}
         for c in cols:
             v = row[c]
-            if hasattr(v, "isoformat"):
+            if v is None or (not isinstance(v, (str, list, dict)) and pd.isna(v)):
+                v = None
+            elif hasattr(v, "isoformat"):
                 v = v.isoformat()
             elif hasattr(v, "item"):
                 v = v.item()
