@@ -44,7 +44,7 @@ AGENT_SIGNALS = [
 
 
 # ---------------------------------------------------------------------------
-# Loading (parquet preferred, csv fallback — matches synthetic_grid.py)
+# Loading (parquet preferred, csv fallback — matches generate_grid.py)
 # ---------------------------------------------------------------------------
 
 def _load_dataframe(stem: str) -> pd.DataFrame:
@@ -61,7 +61,7 @@ def _load_dataframe(stem: str) -> pd.DataFrame:
         return df
     raise FileNotFoundError(
         f"Could not find {parquet_path} or {csv_path}. "
-        "Run synthetic_grid.py first."
+        "Run generate_grid.py first."
     )
 
 

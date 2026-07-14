@@ -261,7 +261,7 @@ if __name__ == "__main__":
     s1 = gridcache._normalize_ts(DEFAULT_END)
     if s0 < t0 or s1 > t1:
         print(f"ERROR: requested window {s0}→{s1} is outside data window {t0}→{t1}")
-        print("Either adjust DEFAULT_START/DEFAULT_END or regenerate data with synthetic_grid.py")
+        print("Either adjust DEFAULT_START/DEFAULT_END or regenerate data with generate_grid.py")
         sys.exit(1)
 
     print("\nNOTE: Each tick runs both compute_agent AND grid_agent (nested).")

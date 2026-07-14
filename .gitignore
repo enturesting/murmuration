@@ -1,0 +1,42 @@
+# --- secrets ---
+murmuration/.env
+.env
+*.env.local
+
+# --- python ---
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+
+# --- editor / OS ---
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- frontend (nictopia/ + any node tooling) ---
+node_modules/
+dist/
+.vite/
+*.local
+*.tsbuildinfo
+nictopia/scripts/raw/
+
+# --- claude code local state ---
+.claude/
+
+# --- HIFLD bulk datasets (too large for GitHub; download from source) ---
+murmuration/murmuration/data/Substations.csv
+murmuration/murmuration/data/US_Electric_Power_Transmission_Lines_*.csv
+murmuration/murmuration/data/US_Electric_Power_Transmission_Lines_*.geojson
+murmuration/murmuration/data/US_Electric_Power_Transmission_Lines_*/
+
+# --- runtime logs ---
+*.log
+/tmp/murm-logs/
