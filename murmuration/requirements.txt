@@ -1,0 +1,22 @@
+# Murmuration runtime dependencies. Tested on Python 3.12.
+# Install: python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# web server
+fastapi==0.136.1
+uvicorn==0.46.0
+websockets==16.0
+httpx==0.28.1
+
+# core
+pydantic==2.13.3
+numpy==2.4.4
+pandas==2.3.3
+
+# ML — used by the load forecaster (GradientBoostingRegressor)
+scikit-learn==1.8.0
+
+# real-time grid data — CAISO load + fuel mix; ERCOT/PJM if API keys
+gridstatus==0.36.0
+
+# narrator (optional — falls back to rule-based if no ANTHROPIC_API_KEY)
+anthropic==0.97.0
