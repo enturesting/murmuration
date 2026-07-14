@@ -2909,9 +2909,13 @@ document.querySelectorAll('#map-tabs button').forEach(btn => {
   btn.onclick = () => switchTab(btn.dataset.tab);
 });
 
-// deep-link: /#flat, /#story, /#econ select a tab on load
-const initTab = location.hash.replace('#', '');
-if (['flat', 'story', 'econ'].includes(initTab)) switchTab(initTab);
+// deep-link: /#flat, /#story, /#econ select a tab on load.
+// Deferred so it runs after the whole script evaluates (avoids TDZ on
+// later let/const like econBuilt and skipped top-level initialization).
+setTimeout(() => {
+  const initTab = location.hash.replace('#', '');
+  if (['flat', 'story', 'econ'].includes(initTab)) switchTab(initTab);
+}, 0);
 
 function switchTab(tab) {
   activeTab = tab;
