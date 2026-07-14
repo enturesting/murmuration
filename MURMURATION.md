@@ -1,5 +1,10 @@
 # Murmuration — Master Brainstorm Document
 
+> **Historical document (April 2026):** this is the team's pre-build design/brainstorm doc, kept as
+> a record of the hackathon process. Some module layouts and counts in §6 drifted from the as-built
+> system — for the shipped architecture and how to run it, see the root [README](README.md) and
+> [`murmuration/README.md`](murmuration/README.md).
+
 **One-line thesis:** AI hyperscalers and the electric grid don't speak. We're building the missing protocol layer that lets them negotiate in real time — demonstrated with a Claude agent on each side, and proven by two reference clients (a hyperscaler compute fleet and a residential VPP) that exercise the same protocol six orders of magnitude apart in asset size.
 
 **Status:** brainstorm / pre-architecture. Use this doc to align the team, then split into work streams.

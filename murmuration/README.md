@@ -75,7 +75,7 @@ python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
 # 3. (optional) drop API keys into .env — see "Optional API keys" below
-cp .env.example .env  # if you have an example file, otherwise create your own
+cp ../.env.example .env  # optional — everything runs without keys
 
 # 4. run
 ./run.sh
@@ -171,7 +171,7 @@ churn.
 ```
 murmuration/
 ├── murmuration/
-│   ├── protocol/        # MurmurationBus + 10 Pydantic message types
+│   ├── protocol/        # MurmurationBus + 12 Pydantic message types
 │   ├── data/            # ISO clients (CAISO/gridstatus, EIA-930), HIFLD loaders
 │   ├── assets/          # FlexibleAsset ABC, DataCenter, HomeAggregator (VPP)
 │   ├── orchestrator/    # GridAgent, ComputeAgent, WorkloadRouter, Narrator
@@ -190,6 +190,11 @@ murmuration/
 ---
 
 ## The 7 message types
+
+> The seven core negotiation types are tabled below, plus two orchestrator-emitted types. The
+> full protocol exports twelve message classes (see `murmuration/protocol/__init__.py`) — the
+> remaining three (`FlexibilityBand`, `CounterOffer`, `TelemetryFrame`) support envelope
+> structure, negotiation, and telemetry.
 
 The bus carries plain Pydantic models. Three are agent → bus, three are
 bus → agent, one is bidirectional:
@@ -237,6 +242,17 @@ You need to create the venv first — see [Quick start](#quick-start) step 2.
 **Browser still shows old UI after editing `ui/index.html`.**
 The server sets `Cache-Control: no-store`, but extensions / service workers
 can still cache. Hard-reload (⌘⇧R / Ctrl+F5).
+
+---
+
+## Triggering scenarios from the command line
+
+The scenario endpoint takes the URL-encoded *display name*, not a slug:
+
+```bash
+curl -X POST 'http://127.0.0.1:8765/api/scenario/Texas%20heat%20wave'   # ✓
+curl -X POST 'http://127.0.0.1:8765/api/scenario/texas_heat_wave'       # ✗ 404
+```
 
 ---
 
