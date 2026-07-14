@@ -10,7 +10,10 @@ from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from murmuration.api.backtest import router as backtest_router
 
 from murmuration.protocol import MurmurationBus
 from murmuration.data import ISOClient
@@ -236,6 +239,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan, title="Murmuration")
+app.include_router(backtest_router)
+
+# nictopia real-incident replay app (static Vite build, committed at ui/replay/)
+REPLAY_DIR = UI_DIR / "replay"
+if REPLAY_DIR.exists():
+    app.mount("/replay", StaticFiles(directory=REPLAY_DIR, html=True), name="replay")
 
 
 @app.get("/")

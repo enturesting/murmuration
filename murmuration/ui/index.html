@@ -175,6 +175,33 @@
     grid-column: 1 / -1; grid-row: 1 / -1;
   }
 
+  #econ-tab {
+    position: absolute; inset: 0; display: none;
+    background: var(--bg-deep);
+    overflow-y: auto;
+    z-index: 4;
+    padding: 52px 26px 26px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #econ-tab h2 { font-size: 13px; letter-spacing: 2px; color: var(--fg); margin-bottom: 4px; }
+  #econ-tab .econ-sub { font-size: 10.5px; color: #5E6E92; margin-bottom: 14px; max-width: 720px; line-height: 1.5; }
+  #econ-tab .econ-btn {
+    background: rgba(0,217,255,0.08); border: 1px solid rgba(0,217,255,0.35);
+    color: var(--fg); font: inherit; font-size: 11px; letter-spacing: 1px;
+    padding: 7px 14px; cursor: pointer; border-radius: 3px;
+  }
+  #econ-tab .econ-btn:hover { background: rgba(0,217,255,0.16); }
+  #econ-tab table { border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
+  #econ-tab th, #econ-tab td { padding: 4px 10px; border-bottom: 1px solid rgba(94,110,146,0.25); text-align: left; }
+  #econ-tab th { color: #5E6E92; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; font-size: 9.5px; }
+  #econ-tab tr.job-row { cursor: pointer; }
+  #econ-tab tr.job-row:hover td { background: rgba(0,217,255,0.05); }
+  #econ-tab .econ-card {
+    border: 1px solid rgba(94,110,146,0.35); border-radius: 4px;
+    padding: 12px 14px; margin: 12px 0; font-size: 11px; line-height: 1.6;
+    background: rgba(10,14,26,0.6); max-width: 720px;
+  }
+  a.pill { text-decoration: none; cursor: pointer; }
   #story-tab {
     position: absolute; inset: 0; display: none;
     background: radial-gradient(ellipse 80% 60% at 50% 35%,
@@ -993,6 +1020,7 @@
     <span id="clock">--:--:-- UTC</span>
   </div>
   <div class="status">
+    <a class="pill" href="/replay/" title="nictopia — real-incident replay demo (standalone)"><span class="dot"></span>▶ REPLAY</a>
     <span class="pill" id="ws-pill"><span class="dot"></span><span id="ws-text">Linking…</span></span>
     <span class="pill" id="claude-pill"><span class="dot"></span><span id="claude-text">Claude</span></span>
     <span class="pill on"><span class="dot"></span>3 ISO · 3 DC</span>
@@ -1004,10 +1032,12 @@
     <div id="globe"></div>
     <div id="flat-map"></div>
     <div id="story-tab"></div>
+    <div id="econ-tab"></div>
     <div class="map-tabs" id="map-tabs">
       <button data-tab="globe" class="active">◐ 3D Globe</button>
       <button data-tab="flat">▦ Flat Map</button>
       <button data-tab="story">◇ Story</button>
+      <button data-tab="econ">⚖ Economics</button>
     </div>
     <div class="state-select-pill" id="state-select-pill" style="display:none">
       <label for="state-select">FOCUS</label>
@@ -2883,11 +2913,12 @@ function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('#map-tabs button').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tab));
-  // story-mode hides right rail + bottom rack so Story has full page
-  document.body.classList.toggle('story-mode', tab === 'story');
+  // story-mode hides right rail + bottom rack so Story (and Economics) get the full page
+  document.body.classList.toggle('story-mode', tab === 'story' || tab === 'econ');
   document.getElementById('globe').style.display = tab === 'globe' ? '' : 'none';
   document.getElementById('flat-map').style.display = tab === 'flat' ? 'block' : 'none';
   document.getElementById('story-tab').style.display = tab === 'story' ? 'flex' : 'none';
+  document.getElementById('econ-tab').style.display = tab === 'econ' ? 'block' : 'none';
   document.querySelector('.globe-controls').style.display = tab === 'globe' ? 'flex' : 'none';
   document.getElementById('globe-hint').style.display = tab === 'globe' ? '' : 'none';
   document.getElementById('state-select-pill').style.display = tab === 'flat' ? 'flex' : 'none';
@@ -2903,6 +2934,94 @@ function switchTab(tab) {
     stopReserveActivation('left flat map');
   }
   if (tab === 'story') ensureStoryTab();
+  if (tab === 'econ') ensureEconTab();
+}
+
+// ====== ECONOMICS TAB (agentic_workflow backtest prototype) =============
+let econBuilt = false;
+function ensureEconTab() {
+  if (econBuilt) return;
+  econBuilt = true;
+  const el = document.getElementById('econ-tab');
+  el.innerHTML = `
+    <h2>⚖ JOB ECONOMICS · BACKTEST PROTOTYPE</h2>
+    <div class="econ-sub">
+      The original hackathon prototype (<span style="color:#8FA3C8">agentic_workflow/</span>):
+      GPU jobs bid for power over a synthetic 14-day, 4-zone grid replay with day-ahead vs
+      real-time prices. Each job carries a max willingness-to-pay — rejection is a correct
+      outcome. Below: the non-LLM cheapest-slot baseline. The full two-agent Claude replay
+      runs from the CLI (see its README).
+    </div>
+    <button class="econ-btn" id="econ-generate">GENERATE 14-DAY DATASET</button>
+    <span id="econ-status" style="font-size:10.5px;color:#5E6E92;margin-left:10px"></span>
+    <div id="econ-summary"></div>
+    <div id="econ-jobs"></div>
+    <div id="econ-rec"></div>`;
+  document.getElementById('econ-generate').onclick = econGenerate;
+  econLoadAll(false);
+}
+
+async function econGenerate() {
+  const st = document.getElementById('econ-status');
+  st.textContent = 'generating…';
+  try {
+    const r = await fetch('/api/backtest/generate', {method: 'POST'});
+    const d = await r.json();
+    st.textContent = r.ok ? `generated: ${(d.generated || []).join(' · ')}` : (d.error || 'failed');
+    if (r.ok) econLoadAll(true);
+  } catch (e) { st.textContent = 'request failed: ' + e; }
+}
+
+async function econLoadAll(announce) {
+  const sumEl = document.getElementById('econ-summary');
+  const jobsEl = document.getElementById('econ-jobs');
+  const s = await fetch('/api/backtest/summary').then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!s) {
+    if (announce) sumEl.innerHTML = `<div class="econ-card">summary unavailable</div>`;
+    else sumEl.innerHTML = `<div class="econ-card" style="color:#5E6E92">No dataset yet — generate one above (runs locally in ~1s, no API keys).</div>`;
+    jobsEl.innerHTML = '';
+    return;
+  }
+  sumEl.innerHTML = `<div class="econ-card">
+    <b style="color:#8FA3C8">DATASET</b> · zones ${s.zones.join(', ')} · ${s.rows.toLocaleString()} rows ·
+    ${s.window.from.slice(0,10)} → ${s.window.to.slice(0,10)}<br>
+    real-time LMP $${s.lmp_rt_usd_per_mwh.min}–$${s.lmp_rt_usd_per_mwh.max}/MWh (avg $${s.lmp_rt_usd_per_mwh.avg}) ·
+    carbon ${s.carbon_g_per_kwh.min}–${s.carbon_g_per_kwh.max} g/kWh</div>`;
+  const j = await fetch('/api/backtest/jobs').then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!j || !j.jobs) { jobsEl.innerHTML = ''; return; }
+  const rows = j.jobs.map(job => `
+    <tr class="job-row" data-job="${job.job_id}">
+      <td>${job.job_id}</td><td>${job.kind}</td><td>${job.bid_type}</td>
+      <td>${job.power_mw} MW</td><td>${job.duration_hours}h</td>
+      <td>$${job.max_price_usd_per_mwh}/MWh</td>
+      <td>${job.region_flexible ? 'flexible' : job.pinned_zone}</td>
+    </tr>`).join('');
+  jobsEl.innerHTML = `<table>
+    <tr><th>job</th><th>kind</th><th>bid type</th><th>power</th><th>duration</th><th>max bid</th><th>region</th></tr>
+    ${rows}</table>
+    <div class="econ-sub" style="margin-top:8px">click a job for its cheapest-slot recommendation</div>`;
+  jobsEl.querySelectorAll('tr.job-row').forEach(tr => {
+    tr.onclick = () => econRecommend(tr.dataset.job);
+  });
+}
+
+async function econRecommend(jobId) {
+  const el = document.getElementById('econ-rec');
+  el.innerHTML = `<div class="econ-card">scoring ${jobId}…</div>`;
+  try {
+    const r = await fetch('/api/backtest/recommend/' + encodeURIComponent(jobId));
+    const d = await r.json();
+    if (!r.ok) { el.innerHTML = `<div class="econ-card">${d.error || 'failed'}</div>`; return; }
+    if (d.status && d.status !== 'scheduled') {
+      el.innerHTML = `<div class="econ-card"><b style="color:#FF7A6B">✕ ${jobId} — ${d.status}</b><br>${d.reason || ''}</div>`;
+      return;
+    }
+    el.innerHTML = `<div class="econ-card">
+      <b style="color:#39E6A3">✓ ${d.job_id} — cheapest feasible slot</b><br>
+      zone <b>${d.zone}</b> · ${d.start_ts_utc} → ${d.end_ts_utc}<br>
+      avg price $${d.avg_price_usd_per_mwh}/MWh (bid cap $${d.max_price_usd_per_mwh}) ·
+      carbon ${d.avg_carbon_g_per_kwh} g/kWh · est. energy cost $${(d.total_energy_cost_usd || 0).toLocaleString()}</div>`;
+  } catch (e) { el.innerHTML = `<div class="econ-card">request failed: ${e}</div>`; }
 }
 
 // ====== FLAT MAP (lazy-loaded D3 + us-atlas) ===========================

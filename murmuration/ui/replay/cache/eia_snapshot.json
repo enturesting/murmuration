@@ -1,0 +1,97 @@
+{
+  "fetched_at": "2026-04-26T01:55:24.771782Z",
+  "source": "EIA Open Data v2 \u2014 EIA-930 fuel-type-data",
+  "route": "https://api.eia.gov/v2/electricity/rto/fuel-type-data/",
+  "carbon_factors_source": "EPA eGRID 2022 (combustion); IPCC AR6 WG3 Annex III (low-carbon lifecycle)",
+  "carbon_factors_g_per_kwh": {
+    "COL": 1001,
+    "NG": 430,
+    "OIL": 893,
+    "NUC": 12,
+    "WAT": 24,
+    "SUN": 48,
+    "WND": 11,
+    "GEO": 38,
+    "OTH": 500,
+    "BAT": 0,
+    "PS": 0,
+    "SNB": 48,
+    "WNB": 11,
+    "OES": 0,
+    "UNK": 500,
+    "UES": 500
+  },
+  "peaker_g_per_kwh": 720,
+  "ccgt_g_per_kwh": 360,
+  "bas": {
+    "CAISO": {
+      "eia_code": "CISO",
+      "name": "California ISO",
+      "snapshot_hour_utc": "2026-04-23T23",
+      "carbon_intensity_g_per_kwh": 69.3,
+      "fuel_mix_mwh": {
+        "GEO": 670,
+        "NG": 1401,
+        "NUC": 2276,
+        "SUN": 10057,
+        "WAT": 487,
+        "WND": 2010
+      },
+      "net_imports_or_storage_mwh": {
+        "OTH": -3968
+      }
+    },
+    "ERCOT": {
+      "eia_code": "ERCO",
+      "name": "Electric Reliability Council of Texas",
+      "snapshot_hour_utc": "2026-04-23T23",
+      "carbon_intensity_g_per_kwh": 227.0,
+      "fuel_mix_mwh": {
+        "COL": 5373,
+        "NG": 18049,
+        "NUC": 4189,
+        "OTH": 1,
+        "SUN": 14061,
+        "WAT": 20,
+        "WND": 20385
+      },
+      "net_imports_or_storage_mwh": {
+        "BAT": -111
+      }
+    },
+    "PJM": {
+      "eia_code": "PJM",
+      "name": "PJM Interconnection",
+      "snapshot_hour_utc": "2026-04-23T23",
+      "carbon_intensity_g_per_kwh": 338.0,
+      "fuel_mix_mwh": {
+        "COL": 14286,
+        "NG": 36587,
+        "NUC": 26853,
+        "OIL": 1650,
+        "OTH": 2292,
+        "SUN": 6919,
+        "WAT": 4172,
+        "WND": 6281
+      },
+      "net_imports_or_storage_mwh": {}
+    },
+    "MISO": {
+      "eia_code": "MISO",
+      "name": "Midcontinent ISO",
+      "snapshot_hour_utc": "2026-04-23T23",
+      "carbon_intensity_g_per_kwh": 303.4,
+      "fuel_mix_mwh": {
+        "BAT": 13,
+        "COL": 12683,
+        "NG": 26608,
+        "NUC": 9680,
+        "OTH": 377,
+        "SUN": 10850,
+        "WAT": 2368,
+        "WND": 20627
+      },
+      "net_imports_or_storage_mwh": {}
+    }
+  }
+}

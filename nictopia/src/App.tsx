@@ -382,7 +382,17 @@ export default function App() {
           <p className="eyebrow">Murmuration · Grid-Aware AI Agents</p>
           <h1>FlexibilityEnvelope Protocol — Live Demo</h1>
         </div>
-        <div className="phase-pill">{complete ? 'Demo Complete' : phaseLabel}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <a
+            href="/"
+            className="phase-pill"
+            style={{ textDecoration: 'none' }}
+            title="Back to the live-agent system"
+          >
+            ← Live agents
+          </a>
+          <div className="phase-pill">{complete ? 'Demo Complete' : phaseLabel}</div>
+        </div>
       </header>
 
       <section className="scenario-strip">
