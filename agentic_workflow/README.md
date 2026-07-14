@@ -1,15 +1,3 @@
-# murmuration
-SCSP AI Hackathon DC
-
-
-Comments:
-Overutilized and underutilized scenarios in local data centers in one region 
-Then if not then it looks at a wider span 
-
-Simplify agentic comments 
-
-Make it simple on API press 
-
 # Grid-Aware Compute Agents
 
 Two AI agents — one representing a grid operator, one representing a fleet of data centers — that negotiate over where and when to run GPU workloads. The compute side bids on power; the grid side surfaces conditions. Together they route compute toward whichever region is cleanest, cheapest, and least stressed, without violating SLAs.
@@ -36,7 +24,7 @@ A working two-agent system in which:
 - A **grid-side agent** ("ISO operator") publishes structured briefings about grid conditions across multiple zones — prices, carbon intensity, stress level, peak status, load vs. forecast.
 - A **compute-side agent** ("DC fleet ops") reads those briefings, evaluates candidate placements, and decides per job whether to schedule, reject, or escalate — playing by **hard-bid rules** (each job has a willingness-to-pay; the agent never schedules above bid unless the job's SLA forces it).
 - Both agents reason in natural language but ground every quantitative claim in tool calls. No hallucinated MWs.
-- The system is benchmarked against two non-LLM baselines (naive and heuristic) on the same simulated trace. The scorecard reports cost, carbon, reject rate, and zone placement distribution — apples-to-apples comparison.
+- The runner emits a scorecard (cost, carbon, reject rate, zone placement distribution) designed for apples-to-apples comparison against non-LLM baselines. (The baseline scripts themselves were not committed before the event ended.)
 
 ---
 
@@ -128,7 +116,7 @@ The job set includes one **showcase** job — `j000_spot_training`, an 80 MW × 
 ## Architecture
 
 ```
-                       runner.py / baselines.py
+                       runner.py
                                   │
                                   ▼
                           compute_agent.py
@@ -175,7 +163,7 @@ project/
 │   ├── synthetic_grid.parquet       # 14d × 4 zones × hourly = 1,344 rows
 │   ├── synthetic_jobs.parquet       # ~26 simulated DC jobs
 │   └── synthetic_scenarios.json     # annotated dramatic events
-├── synthetic_grid.py                # one-shot data generator
+├── generate_grid.py                 # one-shot data generator
 ├── gridcache.py                     # read-only data layer (no LLM)
 ├── grid_agent.py                    # grid-side Claude agent
 ├── compute_agent.py                 # compute-side Claude agent
@@ -228,7 +216,7 @@ ANTHROPIC_API_KEY=sk-ant-...your-key-here...
 ### Generate the synthetic data (once)
 
 ```bash
-python synthetic_grid.py
+python generate_grid.py
 ```
 
 Writes `data/synthetic_grid.parquet`, `data/synthetic_jobs.parquet`, `data/synthetic_scenarios.json`. ~1 second.
@@ -304,9 +292,9 @@ To switch, replace `data/synthetic_grid.parquet` with a real-data parquet of the
 
 ## Status of v1 (what's built)
 
-- ✅ Synthetic data generator with 4 zones and 6 scenarios (`synthetic_grid.py`)
+- ✅ Synthetic data generator with 4 zones and 6 scenarios (`generate_grid.py`)
 - ✅ Read-only data layer with time-of-decision discipline (`gridcache.py`)
 - ✅ Grid-side Claude agent with structured briefing output (`grid_agent.py`)
 - ✅ Compute-side Claude agent with hard-bid decision rules (`compute_agent.py`)
 - ✅ Multi-tick orchestrator with persistent artifacts (`runner.py`)
-- ✅ Naive and heuristic baselines for comparison (`baselines.py`)
+- ⏳ Naive and heuristic baselines (`baselines.py`) — designed, not committed

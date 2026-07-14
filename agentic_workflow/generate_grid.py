@@ -1,5 +1,5 @@
 """
-synthetic_grid.py — Generate signal-rich grid data for 4 zones (DOM, COMED, AEP, ERCOT).
+generate_grid.py — Generate signal-rich grid data for 4 zones (DOM, COMED, AEP, ERCOT).
 
 Outputs to ./data/:
     synthetic_grid.parquet or synthetic_grid.csv
@@ -24,7 +24,7 @@ Schema for the agent's data layer:
         max_price_usd_per_mwh, bid_type
 
 Usage:
-    python synthetic_grid.py
+    python generate_grid.py
 """
 
 from __future__ import annotations
