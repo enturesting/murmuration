@@ -38,8 +38,8 @@ enrichments via [`.env.example`](.env.example).
 
 The end-to-end system demoed on stage: protocol bus with 12 Pydantic message types, GridAgent +
 ComputeAgent, 9 data centers + a 100-home virtual power plant, GBM load forecaster, z-score
-anomaly detector, networkx topology healer, tiered workload router, 9 scenarios, and a 3-tab UI
-(3D globe · flat map · story walkthrough) over FastAPI + WebSocket.
+anomaly detector, networkx topology healer, tiered workload router, 10 scenarios, and a 4-tab UI
+(3D globe · flat map · story walkthrough · economics) over FastAPI + WebSocket.
 
 ```bash
 cd murmuration
@@ -95,7 +95,7 @@ system we staged. The written comparison that drove the final call is in
 
 | Path | What it is |
 |---|---|
-| `murmuration/` | Flagship: protocol + agents + forecasting + topology healer + 3-tab UI |
+| `murmuration/` | Flagship: protocol + agents + forecasting + topology healer + 4-tab UI |
 | `nictopia/` | React globe/flat-map demo over real archived incidents |
 | `agentic_workflow/` | Original two-agent prototype with hard-bid job economics |
 | `MURMURATION.md` | Pre-build design doc (historical) |
@@ -123,4 +123,4 @@ system we staged. The written comparison that drove the final call is in
 - **Rohan Dani** ([@RohanDani2](https://github.com/RohanDani2)) — `agentic_workflow/` prototype:
   synthetic grid generator, hard-bid compute-agent economics
 - **Shashank Chikara** — flagship `murmuration/` package: protocol layer, live agents, anomaly
-  detector, topology healer, 3-tab UI
+  detector, topology healer, multi-tab UI

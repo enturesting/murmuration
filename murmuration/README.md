@@ -57,10 +57,11 @@ For the full design + thesis, read [`MURMURATION.md`](../MURMURATION.md) and
   - **Economics** — the **⚖** tab: a backtest prototype that generates a
     synthetic 14-day dataset, lets you browse hard-bid jobs, and returns a
     per-job cheapest-slot recommendation (no API keys).
-- **9 prebuilt scenarios** wired to the bus — Texas heat wave, CAISO evening
+- **10 prebuilt scenarios** wired to the bus — Texas heat wave, CAISO evening
   ramp, PJM-DOM congestion, CAISO surplus solar, polar vortex cascade, PJM
   line-trip contingency, carbon arbitrage, ERCOT solar eclipse, PJM Loudoun
-  substation overload (AZ-level outage with intra-region failover).
+  substation overload (AZ-level outage with intra-region failover), and VA
+  grid self-healing (500 kV line trip rerouted by the topology healer).
 
 ---
 
