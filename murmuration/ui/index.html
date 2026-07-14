@@ -2909,6 +2909,10 @@ document.querySelectorAll('#map-tabs button').forEach(btn => {
   btn.onclick = () => switchTab(btn.dataset.tab);
 });
 
+// deep-link: /#flat, /#story, /#econ select a tab on load
+const initTab = location.hash.replace('#', '');
+if (['flat', 'story', 'econ'].includes(initTab)) switchTab(initTab);
+
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('#map-tabs button').forEach(b =>
