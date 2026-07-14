@@ -43,9 +43,23 @@ def _no_dataset() -> JSONResponse:
     )
 
 
+def _unreadable(exc: Exception) -> JSONResponse:
+    # e.g. parquet files written by an env with pyarrow, read by one without
+    return JSONResponse(
+        {"error": f"dataset unreadable in this environment: {exc}",
+         "hint": "POST /api/backtest/generate to rebuild it for this environment"},
+        status_code=409,
+    )
+
+
 @router.post("/generate")
 def generate():
     """Run the prototype's one-shot data generator (~1s, no API keys)."""
+    # clear any previous dataset so format preference (parquet vs csv fallback)
+    # always matches what THIS environment can read back
+    if DATA_DIR.exists():
+        for p in DATA_DIR.glob("synthetic_*"):
+            p.unlink()
     proc = subprocess.run(
         [sys.executable, str(AW_DIR / "generate_grid.py")],
         cwd=AW_DIR, capture_output=True, text=True, timeout=180,
@@ -70,6 +84,8 @@ def summary():
         g = gridcache.load_grid()
     except FileNotFoundError:
         return _no_dataset()
+    except ImportError as exc:
+        return _unreadable(exc)
     t0, t1 = gridcache.time_range()
     return {
         "zones": gridcache.available_zones(),
@@ -97,6 +113,8 @@ def jobs():
         j = gridcache.load_jobs()
     except FileNotFoundError:
         return _no_dataset()
+    except ImportError as exc:
+        return _unreadable(exc)
     cols = ["job_id", "kind", "sla", "duration_hours", "power_mw",
             "submitted_ts_utc", "deadline_ts_utc", "region_flexible",
             "pinned_zone", "max_price_usd_per_mwh", "bid_type"]
@@ -125,6 +143,8 @@ def recommend(job_id: str, max_stress_score: int = 3):
         j = gridcache.load_jobs()
     except FileNotFoundError:
         return _no_dataset()
+    except ImportError as exc:
+        return _unreadable(exc)
     rows = j[j["job_id"] == job_id]
     if rows.empty:
         return JSONResponse({"error": f"unknown job_id {job_id!r}"}, status_code=404)
